@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import connection
+from datetime import date
 
-# 
-dados = []
-aluno_id_counter = 1
+hoje = date.today()
+
 
 # Formatação colunas
 alunos = [{"nome":linha[1]} for linha in connection.listar_alunos()]
@@ -36,12 +36,15 @@ def atualizar_combobox_disciplina(event):
 def display_data():
     for row in tree.get_children():
         tree.delete(row)
-    for dado in dados:
+    
+    dados_atualizados = connection.listar_notas()  
+
+    for dado in dados_atualizados:
         tree.insert("", tk.END, values=dado)
+
 
 # Adicionar novo registro
 def add_nota():
-    global aluno_id_counter
     nome = nome_cb.get()
     curso = curso_cb.get()
     disciplina = disciplina_cb.get()
@@ -52,9 +55,7 @@ def add_nota():
         return
 
     if nome and curso and disciplina:
-        novo_dado = (aluno_id_counter, nome, curso, disciplina, nota)
-        dados.append(novo_dado)
-        aluno_id_counter += 1
+        connection.inserir_nota(nome, curso, nota, disciplina, hoje.strftime("%Y-%m-%d"))
         display_data()
     else:
         messagebox.showwarning("Aviso", "Preencha todos os campos.")
@@ -92,7 +93,8 @@ nota_entry.grid(row=1, column=3, padx=5, pady=5)
 tk.Button(frame_top, text="Salvar Nota", command=add_nota, font=("Arial", 14)).grid(row=2, column=1, pady=10)
 
 # Tabela
-columns = ["ID", "Nome", "Curso", "Disciplina", "Nota"]
+
+columns = ["ID", "Nome", "Curso", "Disciplina", "Nota", "Data"]
 tree = ttk.Treeview(root, columns=columns, show="headings")
 tree.pack(fill="both", expand=True, padx=10, pady=10)
 

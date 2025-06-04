@@ -1,4 +1,7 @@
 import sqlite3 as conector
+from datetime import date
+
+hoje = date.today()
 
 
 def conectar ():
@@ -20,13 +23,16 @@ def listar_alunos():
     cursor.execute("SELECT * FROM cad_alunos")
     alunos = cursor.fetchall()
 
+    conexao.close()
+
     if not alunos:
         print("Nenhum aluno encontrado.")
     else:
         print("Lista de alunos:")
+ 
         return alunos
 
-    conexao.close()
+
  
 
 def inserir_cursos(nomecurso:str):
@@ -44,14 +50,14 @@ def listar_cursos():
 
     cursor.execute("SELECT * FROM cursos")
     cursos = cursor.fetchall()
-
+    conexao.close()
     if not cursos:
         print("Nenhum curso encontrado.")
     else:
         print("Lista de Cursos:")
         return cursos
 
-    conexao.close()
+    
  
 
 def inserir_disciplina(nome_disciplina: str, nome_curso: str):
@@ -82,6 +88,7 @@ def listar_disciplinas():
 
     cursor.execute("SELECT * FROM disciplinas")
     disciplinas = cursor.fetchall()
+    conexao.close()
 
     if not disciplinas:
         print("Nenhuma disciplina encontrada.")
@@ -89,7 +96,7 @@ def listar_disciplinas():
         print("Lista de Disciplinas:")
         return disciplinas
 
-    conexao.close()
+    
  
 
 def inserir_matricula(nome_aluno:str, nome_curso:str, data_matricula:str):
@@ -104,7 +111,7 @@ def inserir_matricula(nome_aluno:str, nome_curso:str, data_matricula:str):
     resultado_aluno = cursor.fetchone()
 
     if data_matricula is None:
-        data_matricula = "24-05-2025"
+        data_matricula = hoje.strftime("%Y-%m-%d")
 
     if resultado_curso is None:
         print("Curso não encontrado!")
@@ -122,7 +129,7 @@ def inserir_matricula(nome_aluno:str, nome_curso:str, data_matricula:str):
 
     conexao.close()
 
-def inserir_nota(nome_aluno: str, nome_curso: str, nota: float, data_avaliacao: str):
+def inserir_nota(nome_aluno: str, nome_curso: str, nota: float, disciplina:str, data_avaliacao: str):
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -132,16 +139,22 @@ def inserir_nota(nome_aluno: str, nome_curso: str, nota: float, data_avaliacao: 
     cursor.execute("SELECT aluno_id FROM cad_alunos WHERE nome = ?", (nome_aluno,))
     resultado_aluno = cursor.fetchone()
 
+    cursor.execute("SELECT id_disciplina FROM disciplinas WHERE nome_disciplina = ?", (disciplina,))
+    resultado_disciplina = cursor.fetchone()
+
     if data_avaliacao is None:
-        data_avaliacao = "2025-05-24"
+        hoje.strftime("%Y-%m-%d")
 
     if resultado_curso is None:
         print("Curso não encontrado!")
     elif resultado_aluno is None:
         print("Aluno não encontrado!")
+    elif resultado_disciplina is None:
+        print("Disciplina não encontrada")
     else:
         curso_id = resultado_curso[0]
         aluno_id = resultado_aluno[0]
+        disciplina_id = resultado_disciplina[0]
 
         cursor.execute(
             "SELECT matricula_id FROM matriculas WHERE aluno_id = ? AND curso_id = ?",
@@ -156,14 +169,47 @@ def inserir_nota(nome_aluno: str, nome_curso: str, nota: float, data_avaliacao: 
             print("Matrícula encontrada com sucesso!")
 
             cursor.execute(
-                "INSERT INTO notas (matricula_id, nota, data_avaliacao) VALUES (?, ?, ?)",
-                (matricula_id, nota, data_avaliacao)
+                "INSERT INTO notas (matricula_id, nota, data_avaliacao, disciplina_id) VALUES (?, ?, ?, ?)",
+                (matricula_id, nota, data_avaliacao, disciplina_id)
             )
             conexao.commit()
+            
             print("Nota inserida com sucesso!")
-
+            
     conexao.close()
 
+def listar_notas():
+
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+
+    SELECT 
+        notas.nota_id,
+        cad_alunos.nome AS alunonome,
+        cursos.nomecurso AS cursonome,
+        disciplinas.nome_disciplina AS disciplinanome,
+        notas.nota,
+        notas.data_avaliacao
+    FROM
+        notas
+    JOIN
+        matriculas ON notas.matricula_id = matriculas.matricula_id
+    JOIN
+        cad_alunos ON matriculas.aluno_id = cad_alunos.aluno_id
+    JOIN
+        cursos ON matriculas.curso_id = cursos.id_curso
+    JOIN
+        disciplinas ON disciplinas.id_disciplina = notas.disciplina_id
+
+    """)
+
+    resultado = cursor.fetchall()
+    conexao.close()
+    return resultado
+
+    
         
 def buscar_curso_aluno(nome_aluno:str):
 
@@ -186,7 +232,7 @@ def buscar_curso_aluno(nome_aluno:str):
             curso_id = resultado_curso[0]
             cursor.execute("SELECT nomecurso FROM cursos WHERE id_curso= ?", (curso_id,))
             resultado_curso = cursor.fetchone()
-
+            conexao.close()
             return resultado_curso
 
 
@@ -200,6 +246,8 @@ def buscar_disciplina_curso(curso_nome:str):
     cursor.execute("SELECT id_curso FROM cursos WHERE nomecurso = ?", (curso_nome,))
     resultado_curso = cursor.fetchone()
 
+    
+
     if resultado_curso is None:
         print("Curso não encontrado!")
     else:
@@ -209,6 +257,10 @@ def buscar_disciplina_curso(curso_nome:str):
 
         print(resultado_disciplinas)
 
+        conexao.close()
         return resultado_disciplinas
-
+    
     conexao.close()
+    
+
+listar_notas()

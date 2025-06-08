@@ -1,5 +1,6 @@
 import sqlite3 as conector
 from datetime import date
+from tkinter import messagebox
 
 hoje = date.today()
 
@@ -232,14 +233,22 @@ def inserir_nota(nome_aluno: str, nome_curso: str, nota: float, disciplina:str, 
             print("Matrícula não encontrada!")
         else:
             matricula_id = resultado_matricula[0]
-            print("Matrícula encontrada com sucesso!")     
-            cursor.execute(
-                "INSERT INTO notas (matricula_id, nota, data_avaliacao, disciplina_id) VALUES (?, ?, ?, ?)",
-                (matricula_id, nota, data_avaliacao, disciplina_id)
-            )
-            conexao.commit()
-            
-            print("Nota inserida com sucesso!")
+
+            cursor.execute("""
+                SELECT 1 FROM notas 
+                WHERE matricula_id = ? AND disciplina_id = ? AND data_avaliacao = ?
+            """, (matricula_id, disciplina_id, data_avaliacao))
+
+            if cursor.fetchone():
+                messagebox.showwarning("Aviso", "Essa nota já está cadastrado.")
+                print("Já existe uma nota cadastrada para essa avaliação.")
+            else:
+                cursor.execute("""
+                    INSERT INTO notas (matricula_id, nota, data_avaliacao, disciplina_id) 
+                    VALUES (?, ?, ?, ?)
+                """, (matricula_id, nota, data_avaliacao, disciplina_id))
+                conexao.commit()
+                print("Nota inserida com sucesso!")
             
     conexao.close()
 

@@ -20,11 +20,13 @@ def atualizar_alunos_combobox():
     alunos = [{"nome": linha[1]} for linha in connection.listar_alunos()]
     alunos_formatados = [f"{aluno['nome']}" for aluno in alunos]
     nome_cb['values'] = alunos_formatados
+    nome_cb.set('')
 
 def atualizar_cursos_combobox():
     cursos = [{"nomecurso":linha[1]} for linha in connection.listar_cursos()]
     cursos_formatados = [f"{curso['nomecurso']}" for curso in cursos]
     curso_cb['values'] = cursos_formatados
+    curso_cb.set('')
 
 def atualizar_combobox_curso_por_aluno(event):
     nome = nome_cb.get()
@@ -38,6 +40,7 @@ def atualizar_disciplinas_combobox():
     disciplinas = [{"nome_disciplina":linha[1]} for linha in connection.listar_disciplinas()]
     disciplinas_formatados = [f"{disciplina['nome_disciplina']}" for disciplina in disciplinas]
     disciplina_cb['values'] = disciplinas_formatados
+    disciplina_cb.set('')
 
 def atualizar_combobox_disciplina_por_curso(event):
     curso = curso_cb.get()
@@ -51,8 +54,14 @@ def atualizar_combobox_disciplina_por_curso(event):
 def display_data():
     for row in tree.get_children():
         tree.delete(row)
-    
+
+
     dados_atualizados = connection.listar_notas()  
+
+    nome_cb.set('')
+    curso_cb.set('')
+    disciplina_cb.set('')
+    nota_entry.delete(0, tk.END)
 
     for dado in dados_atualizados:
         tree.insert("", tk.END, values=dado)
@@ -127,16 +136,15 @@ menu_adicionar.add_command(label="Matrícula", command=win.tela_adicionar_matric
 menu_bar.add_cascade(label="Adicionar", menu=menu_adicionar)
 
 menu_deletar = tk.Menu(menu_bar, tearoff=0)
-menu_deletar.add_command(label="Aluno", command=lambda: win.tela_deletar_aluno(atualizar_alunos_combobox))
-menu_deletar.add_command(label="Curso", command=lambda: win.tela_deletar_curso(atualizar_cursos_combobox))
-menu_deletar.add_command(label="Disciplina", command=lambda: win.tela_deletar_disciplina(atualizar_disciplinas_combobox))
+menu_deletar.add_command(label="Aluno", command=lambda: win.tela_deletar_aluno(atualizar_alunos_combobox, display_data))
+menu_deletar.add_command(label="Curso", command=lambda: win.tela_deletar_curso(atualizar_cursos_combobox, display_data))
+menu_deletar.add_command(label="Disciplina", command=lambda: win.tela_deletar_disciplina(atualizar_disciplinas_combobox, display_data))
 menu_bar.add_cascade(label="Excluir", menu=menu_deletar)
 
 # Adiciona a barra de menu na janela
 root.config(menu=menu_bar)
 
 menu_tabela = tk.Menu(root, tearoff=0)
-menu_tabela.add_command(label="Editar")
 menu_tabela.add_command(label="Excluir", command=excluir_item)
 
 

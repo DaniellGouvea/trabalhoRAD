@@ -199,9 +199,9 @@ def tela_adicionar_matricula():
 
     root.mainloop()
 
-def tela_deletar_aluno(callback_atualizar_combobox):
-    alunos_raw = connection.listar_alunos()  # Exemplo: [(1, "João"), (2, "Maria")]
-    alunos_dict = {linha[1]: linha[0] for linha in alunos_raw}  # {"João": 1, "Maria": 2}
+def tela_deletar_aluno(callback_atualizar_combobox, callback_display):
+    alunos_raw = connection.listar_alunos() 
+    alunos_dict = {linha[1]: linha[0] for linha in alunos_raw} 
     alunos_formatados = list(alunos_dict.keys())
 
     root = tk.Toplevel()  
@@ -233,6 +233,7 @@ def tela_deletar_aluno(callback_atualizar_combobox):
                 connection.deletar_aluno(id_aluno)
                 connection.deletar_matricula_por_aluno(id_aluno)
                 callback_atualizar_combobox()
+                callback_display()
                 messagebox.showinfo("Sucesso", f"Aluno '{nome_selecionado}' deletado com sucesso!", parent=root)
                 root.destroy()
             else:
@@ -245,7 +246,7 @@ def tela_deletar_aluno(callback_atualizar_combobox):
 
     root.mainloop()
 
-def tela_deletar_curso(callback_atualizar_combobox):
+def tela_deletar_curso(callback_atualizar_combobox, callback_display):
     cursos_raw = connection.listar_cursos()  
     cursos_dict = {linha[1]: linha[0] for linha in cursos_raw}
     cursos_formatados = list(cursos_dict.keys())
@@ -279,6 +280,7 @@ def tela_deletar_curso(callback_atualizar_combobox):
                 connection.deletar_curso(id_curso)
                 connection.deletar_matricula_por_curso(id_curso)
                 callback_atualizar_combobox()
+                callback_display()
                 messagebox.showinfo("Sucesso", f"Curso '{curso_selecionado}' deletado com sucesso!", parent=root)
                 root.destroy()
             else:
@@ -291,7 +293,7 @@ def tela_deletar_curso(callback_atualizar_combobox):
 
     root.mainloop()
 
-def tela_deletar_disciplina(callback_atualizar_combobox):
+def tela_deletar_disciplina(callback_atualizar_combobox, callback_display):
     disc_raw = connection.listar_disciplinas()  
     disc_dict = {linha[1]: linha[0] for linha in disc_raw}
     disc_formatados = list(disc_dict.keys())
@@ -324,6 +326,7 @@ def tela_deletar_disciplina(callback_atualizar_combobox):
             if id_disc:
                 connection.deletar_disciplina(id_disc)
                 callback_atualizar_combobox()
+                callback_display()
                 messagebox.showinfo("Sucesso", f"Disciplina '{disc_selecionado}' deletado com sucesso!", parent=root)
                 root.destroy()
             else:

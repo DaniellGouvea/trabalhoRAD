@@ -18,15 +18,15 @@ class disciplinas:
 class matricula:
 
     def __init__(self, nome_aluno:str, nome_curso:str, data_matricula:str):
-        self.nome_aluno = nome_aluno,
-        self.nome_curso = nome_curso,
+        self.nome_aluno = nome_aluno
+        self.nome_curso = nome_curso
         self.data_matricula = data_matricula
 
 class nota: 
 
     def __init__(self, nome_aluno: str, nome_curso: str, nota: float, data_avaliacao: str):
-        self.nome_aluno = nome_aluno,
-        self.nome_curso = nome_curso,
-        self.nota = nota,
+        self.nome_aluno = nome_aluno
+        self.nome_curso = nome_curso
+        self.nota = nota
         self.data_avaliacao = data_avaliacao
 

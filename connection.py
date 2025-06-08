@@ -32,8 +32,21 @@ def listar_alunos():
  
         return alunos
 
+def deletar_aluno(id_aluno):
 
- 
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("DELETE FROM cad_alunos WHERE aluno_id = ?", (id_aluno,))
+    conexao.commit()
+
+    if cursor.rowcount == 0:
+        print(f"Nenhuma aluno com ID {id_aluno} foi encontrada.")
+    else:
+        print(f"Aluno com ID {id_aluno} deletada com sucesso.")
+
+    conexao.close()
+
 
 def inserir_cursos(nomecurso:str):
 
@@ -57,8 +70,20 @@ def listar_cursos():
         print("Lista de Cursos:")
         return cursos
 
+def deletar_curso(id_curso:int):
     
- 
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("DELETE FROM cursos WHERE id_curso = ?", (id_curso,))
+    conexao.commit()
+
+    if cursor.rowcount == 0:
+        print(f"Nenhuma nota com ID {id_curso} foi encontrada.")
+    else:
+        print(f"Nota com ID {id_curso} deletada com sucesso.")
+
+    conexao.close()
 
 def inserir_disciplina(nome_disciplina: str, nome_curso: str):
 
@@ -96,8 +121,19 @@ def listar_disciplinas():
         print("Lista de Disciplinas:")
         return disciplinas
 
-    
- 
+def deletar_disciplina(id_disciplina:int):
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("DELETE FROM disciplinas WHERE id_disciplina = ?", (id_disciplina,))
+    conexao.commit()
+
+    if cursor.rowcount == 0:
+        print(f"Nenhuma disciplina com ID {id_disciplina} foi encontrada.")
+    else:
+        print(f"Disciplina com ID {id_disciplina} deletada com sucesso.")
+
+    conexao.close()
 
 def inserir_matricula(nome_aluno:str, nome_curso:str, data_matricula:str):
 
@@ -126,6 +162,36 @@ def inserir_matricula(nome_aluno:str, nome_curso:str, data_matricula:str):
         )
         conexao.commit()
         print("Matricula inserida com sucesso!")
+
+    conexao.close()
+
+def deletar_matricula_por_aluno(id_aluno):
+
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("DELETE FROM matriculas WHERE aluno_id = ?", (id_aluno,))
+    conexao.commit()
+
+    if cursor.rowcount == 0:
+        print(f"Nenhuma matricula com ID {id_aluno} foi encontrada.")
+    else:
+        print(f"Matricula com ID {id_aluno} deletada com sucesso.")
+
+    conexao.close()
+
+def deletar_matricula_por_curso(id_curso):
+
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("DELETE FROM matriculas WHERE curso_id = ?", (id_curso,))
+    conexao.commit()
+
+    if cursor.rowcount == 0:
+        print(f"Nenhuma Matricula com ID {id_curso} foi encontrada.")
+    else:
+        print(f"Matricula com ID {id_curso} deletada com sucesso.")
 
     conexao.close()
 
@@ -166,8 +232,7 @@ def inserir_nota(nome_aluno: str, nome_curso: str, nota: float, disciplina:str, 
             print("Matrícula não encontrada!")
         else:
             matricula_id = resultado_matricula[0]
-            print("Matrícula encontrada com sucesso!")
-
+            print("Matrícula encontrada com sucesso!")     
             cursor.execute(
                 "INSERT INTO notas (matricula_id, nota, data_avaliacao, disciplina_id) VALUES (?, ?, ?, ?)",
                 (matricula_id, nota, data_avaliacao, disciplina_id)
@@ -209,8 +274,21 @@ def listar_notas():
     conexao.close()
     return resultado
 
+def deletar_nota(id_nota:int):
     
-        
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("DELETE FROM notas WHERE nota_id = ?", (id_nota,))
+    conexao.commit()
+
+    if cursor.rowcount == 0:
+        print(f"Nenhuma nota com ID {id_nota} foi encontrada.")
+    else:
+        print(f"Nota com ID {id_nota} deletada com sucesso.")
+
+    conexao.close()
+
 def buscar_curso_aluno(nome_aluno:str):
 
     conexao = conectar()
@@ -261,6 +339,3 @@ def buscar_disciplina_curso(curso_nome:str):
         return resultado_disciplinas
     
     conexao.close()
-    
-
-listar_notas()
